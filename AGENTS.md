@@ -4,175 +4,167 @@
 
 Open Controller Framework (OCF)
 
-OCF is a modular, target-agnostic framework for defining, validating, transforming, and exporting controller systems.
+OCF is a schema-first, target-agnostic framework for controller definition and transformation.
 
-This repository contains the core logical foundation of OCF.
+---
 
-## Primary Goal
+## Core Principle
 
-Build a clean, reusable, schema-first controller framework that sits between authoring frontends and concrete targets.
+OCF is the **canonical logical layer**.
 
-OCF must remain:
+Everything else is external.
 
-- DAW-agnostic
-- runtime-agnostic
-- frontend-agnostic at the core level
+---
 
-## Core Architecture Rules
+## Non-Negotiable Rules
 
-### 1. Keep Core, Adapter, and UI Separate
+### 1. Core is fully independent
 
-Always preserve the separation between:
+OCF must not depend on:
 
-- **Core**
-  - canonical types
-  - schemas
-  - validation
-  - layout logic
-  - constraints
-  - abstract interaction and mapping models
-- **Adapter**
-  - target-specific translation logic
-  - target capability handling
-  - export generation
-- **UI / Tooling**
-  - editors
-  - helper tools
-  - plugin management
-  - visual workflows
+- specific authoring tools
+- CAD systems
+- ECAD tools
+- runtimes
+- DAWs
+- external workflows
 
-Do not mix these concerns.
+---
 
-### 2. OCF Core Must Stay Target-Agnostic
+### 2. Strict separation
 
-The core may describe abstract controller behavior, but it must not contain:
+Always separate:
 
-- Bitwig-specific logic
-- Ableton-specific logic
-- Giada-specific runtime logic
-- FreeCAD-specific UI behavior
-- host-application-specific assumptions
+#### Core
+- schema
+- types
+- layout
+- constraints
+- validation
+- interaction model
 
-### 3. FreeCAD Is Not the Core
+#### Adapter
+- target-specific logic
+- translation
+- export
 
-FreeCAD is the primary mechanical authoring frontend, but not the logical source of truth by itself.
+#### Tooling
+- UI
+- CAD
+- editors
+- workflows
 
-Do not design OCF in a way that requires FreeCAD internals for the core model to make sense.
+---
 
-### 4. Giada Is Not the Definition of OCF
+### 3. No target leakage
 
-Giada is one possible runtime target.
+Core must not contain:
 
-Do not design the core around Giada assumptions.
-Do not turn OCF into a Giada-specific abstraction layer.
+- DAW logic
+- MIDI specifics
+- protocol-specific behavior
+- runtime assumptions
 
-## Single Source of Truth
+---
 
-The canonical source of truth for controller semantics must be the OCF schema and type system.
+### 4. No frontend leakage
 
-Implications:
+Core must not contain:
 
-- UI data must not silently redefine schema meaning
-- adapter internals must not redefine core semantics
-- runtime assumptions must not back-propagate into core types
-- generated artifacts are never the canonical model
+- FreeCAD logic
+- KiCad logic
+- STEP/PCB assumptions
+- Workbench-specific behavior
+
+---
+
+### 5. Schema is source of truth
+
+Never treat:
+
+- UI state
+- exported data
+- adapter output
+
+as canonical.
+
+Only OCF schema is canonical.
+
+---
+
+## Decision Rules
+
+### Belongs in Core?
+
+YES if:
+
+- defines controller semantics
+- defines structure
+- defines constraints
+- defines layout rules
+
+---
+
+### Belongs in Adapter?
+
+YES if:
+
+- target-specific
+- export-related
+- constrained by external system
+
+---
+
+### Belongs in Tooling?
+
+YES if:
+
+- UI-related
+- CAD-related
+- workflow-related
+- visualization-related
+
+---
 
 ## What Agents May Do
 
-Agents may:
+- refine architecture
+- improve documentation
+- clarify boundaries
+- define schemas
+- define constraints
+- define layout rules
+- define adapter contracts
 
-- refine documentation
-- improve architecture clarity
-- propose clearer crate/module boundaries
-- strengthen schema definitions
-- improve validation concepts
-- specify adapter contracts
-- identify inconsistencies
-- restructure docs for maintainability
-- make implicit architecture decisions explicit
+---
 
-## What Agents Must Not Do
+## What Agents Must NOT Do
 
-Agents must not:
+- add target logic to core
+- add CAD logic to core
+- optimize for one system
+- bypass schemas
+- mix layers
 
-- add DAW-specific logic into the core
-- add runtime-specific shortcuts into generic types
-- treat FreeCAD as the only valid authoring path
-- treat Giada as the primary or exclusive target
-- collapse adapter and core boundaries
-- invent undocumented hidden assumptions
-- bypass schema definitions with ad-hoc structures
-- optimize for one target in a way that harms portability
+---
 
-## Schema and Types
+## Design Priority
 
-Agents must prefer:
+1. correctness
+2. clarity
+3. portability
+4. extensibility
 
-- explicit schemas
-- portable types
-- deterministic transformations
-- stable naming
-- validation-friendly structures
-- adapter-safe abstractions
+NOT:
 
-When in doubt:
+- convenience
+- shortcuts
+- early optimization
 
-- move target specifics out of the core
-- keep semantics abstract
-- document assumptions explicitly
+---
 
-## Core vs Adapter Decision Rule
+## Final Rule
 
-If logic answers the question:
+If something makes OCF depend on a tool, a runtime, or a target:
 
-- “What is a controller?”
-- “What controls, layout, constraints, and interactions exist?”
-- “How should portable validation work?”
-
-then it belongs in **Core**.
-
-If logic answers the question:
-
-- “How does Bitwig represent this?”
-- “How does Ableton consume this?”
-- “How does Giada run this?”
-- “How does OSC transport this?”
-
-then it belongs in an **Adapter**.
-
-## Non-Negotiable Rule
-
-No DAW-specific logic in the core.
-
-This includes:
-
-- API field names
-- script structure assumptions
-- transport semantics tied to one host
-- host lifecycle assumptions
-- target-specific naming conventions
-
-## Development Style
-
-Work:
-
-- architecture-first
-- documentation-driven
-- incrementally
-- with low coupling
-- with high reuse in mind
-
-Prefer:
-
-- small, explicit decisions
-- stable abstractions
-- clear boundaries
-- future adapter extensibility
-
-## Repository Intent
-
-This repository should become the stable logical heart of the larger controller ecosystem.
-
-Everything that depends on OCF should become easier to build because OCF is cleanly defined.
-
-Not because OCF absorbs the complexity of every target.
+→ it is wrong
